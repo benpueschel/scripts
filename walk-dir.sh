@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/basha
 
 all_files=false
 
@@ -16,12 +16,11 @@ list_files() {
 		fi
 		FILE="$1/$file"
 		if [ -d "$FILE" ]; then
-			list_files $FILE
+			list_files "$FILE"
 		else
-			printf '%s\n' $FILE
+			printf '%s\n' "$FILE"
 		fi
-#	done <<< ""
-	done <<< "$(ls $(if $all_files; then echo "-a"; fi) $1)"
+	done <<< "$(ls $(if $all_files; then echo "-a"; fi) "$1")"
 }
 
-list_files ${@: -1} # list files using the last cli argument
+list_files "${@: -1}" # list files using the last cli argument
