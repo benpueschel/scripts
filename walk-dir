@@ -1,0 +1,28 @@
+#!/bin/bash
+
+all_files=false
+
+while getopts :a flag
+do case "${flag}" in
+		a) all_files=true;dir='';;
+		?) exit 1;;
+	esac
+done
+
+dir="${!OPTIND}"
+
+list_files() {
+	while IFS= read -r file; do
+		if [[ -z "$file" || "$file" = "." || "$file" = ".." ]]; then # if line is empty or '.' or '..', skip
+			continue
+		fi
+		FILE="$(if [ $1 ]; then echo "$1/"; fi)$file"
+		if [ -d "$FILE" ]; then
+			list_files "$FILE"
+		else
+			printf '%s\n' "$FILE"
+		fi
+	done <<< "$(ls $(if $all_files; then echo "-a"; fi) $(if [ $1 ]; then echo "$1"; fi))"
+}
+
+list_files "$dir" # list files using the last cli argument
