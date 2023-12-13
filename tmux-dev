@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+
+$SESSION_NAME=$1
+if [ -z $SESSION_NAME ]; then
+	SESSION_NAME=${PWD##*/}          # default to current directory name if no argument is present
+	SESSION_NAME=${SESSION_NAME:-/}        # to correct for the case where PWD=/
+fi
+
+tmux new-session -s "$SESSION_NAME" -x "$(tput cols)" -y "$(tput lines)" -d "${EDITOR:-vim}"
+tmux split-window -h -p 30
+
+tmux -2 attach-session -d
