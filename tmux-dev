@@ -7,7 +7,15 @@ if [ -z $SESSION_NAME ]; then
 	SESSION_NAME=${SESSION_NAME:-/}        # to correct for the case where PWD=/
 fi
 
-tmux new-session -s "$SESSION_NAME" -x "$(tput cols)" -y "$(tput lines)" -d "${EDITOR:-vim}"
-tmux split-window -h -p 30
+tmux new-session -d -s "$SESSION_NAME" -x "$(tput cols)" -y "$(tput lines)" 
+
+window=1
+tmux send-keys -t $SESSION_NAME:$window "${EDITOR:-vim}" C-m
+
+window=2
+tmux new-window -t $SESSION_NAME:$window -n "git"
+tmux send-keys -t $SESSION_NAME:$window "git status" C-m
+
+tmux select-window -t $SESSION_NAME:1
 
 tmux -2 attach-session -d
