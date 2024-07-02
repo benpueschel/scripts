@@ -1,21 +1,81 @@
 #!/usr/bin/env bash
 
+# This script creates a new tmux session with two windows:
+# 1. Your editor of choice (uses $EDITOR if set, otherwise defaults to vim)
+# 2. A shell prompt with git status
+# 
+# If the session already exists, the script will attach to it.
+# If the script is run from within a tmux session, 
+# it will switch to the existing session.
+#
+# Usage: tmux-dev [target-directory] [session-name]
+#
+# If no arguments are provided, the script will use fzf to select a directory
+# and default to the directory name as the session name. 
+# If only one argument is provided, it will be used as the target directory and 
+# the session name will default to the directory name. 
+# If two arguments are provided, the first will be used as the target directory
+# and the second as the session name.
 
-$SESSION_NAME=$1
-if [ -z $SESSION_NAME ]; then
-	SESSION_NAME=${PWD##*/}          # default to current directory name if no argument is present
-	SESSION_NAME=${SESSION_NAME:-/}        # to correct for the case where PWD=/
+function error_handler {
+	local status=$?
+	if [ $status -ne 0 ]; then
+		exit $status
+	fi
+}
+
+function make_session {
+	tmux new-session -d -s "$SESSION_NAME" -c $TARGET \
+		-x "$(tput cols)" -y "$(tput lines)"
+	error_handler
+
+	window=1
+	tmux send-keys -t $SESSION_NAME:$window "${EDITOR:-vim}" C-m
+	error_handler
+
+	window=2
+	tmux new-window -t $SESSION_NAME:$window -n "git" -c $TARGET
+	error_handler
+	tmux send-keys -t $SESSION_NAME:$window "git status" C-m
+	error_handler
+
+	tmux select-window -t $SESSION_NAME:1
+	error_handler
+
+	tmux -2 attach-session -d
+}
+
+TARGET=$1
+if [ -z $TARGET ]; then
+	# use fzf to select a directory if no argument is present
+	folders="~/projects"
+	TARGET=$(find ~/ ~/projects -mindepth 1 -maxdepth 1 -type d | fzf)
+else
+	TARGET=$(realpath $TARGET)
 fi
 
-tmux new-session -d -s "$SESSION_NAME" -x "$(tput cols)" -y "$(tput lines)" 
+if [ -z $TARGET ]; then
+	exit 0
+fi
 
-window=1
-tmux send-keys -t $SESSION_NAME:$window "${EDITOR:-vim}" C-m
+SESSION_NAME=$2
+if [ -z $SESSION_NAME ]; then
+	SESSION_NAME=${TARGET##*/} 			# default to target directory name if 
+										# no argument is present
+	SESSION_NAME=${SESSION_NAME:-/} 	# to correct for the case where 
+										# TARGET=/
+fi
 
-window=2
-tmux new-window -t $SESSION_NAME:$window -n "git"
-tmux send-keys -t $SESSION_NAME:$window "git status" C-m
+# if the session doesn't exist, create it
+if ! tmux has-session -t $SESSION_NAME 2> /dev/null; then
+	make_session
+fi
 
-tmux select-window -t $SESSION_NAME:1
+# if we're not in a tmux session, attach to the existing session
+if [[ -z $TMUX ]]; then
+	tmux attach -t $SESSION_NAME
+	exit 0
+fi
 
-tmux -2 attach-session -d
+# if we're in a tmux session, switch to the existing session
+tmux switch-client -t $SESSION_NAME
