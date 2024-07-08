@@ -30,16 +30,16 @@ function make_session {
 	error_handler
 
 	window=1
-	tmux send-keys -t $SESSION_NAME:$window "${EDITOR:-vim}" C-m
+	tmux send-keys -t="$SESSION_NAME:$window" "${EDITOR:-vim}" C-m
 	error_handler
 
 	window=2
-	tmux new-window -t $SESSION_NAME:$window -n "git" -c $TARGET
+	tmux new-window -t="$SESSION_NAME:$window" -n "git" -c $TARGET
 	error_handler
-	tmux send-keys -t $SESSION_NAME:$window "git status" C-m
+	tmux send-keys -t="$SESSION_NAME:$window" "git status" C-m
 	error_handler
 
-	tmux select-window -t $SESSION_NAME:1
+	tmux select-window -t="$SESSION_NAME:1"
 	error_handler
 
 	tmux -2 attach-session -d
@@ -67,15 +67,15 @@ if [ -z $SESSION_NAME ]; then
 fi
 
 # if the session doesn't exist, create it
-if ! tmux has-session -t $SESSION_NAME 2> /dev/null; then
+if ! tmux has-session -t="$SESSION_NAME" 2> /dev/null; then
 	make_session
 fi
 
 # if we're not in a tmux session, attach to the existing session
 if [[ -z $TMUX ]]; then
-	tmux attach -t $SESSION_NAME
+	tmux attach -t="$SESSION_NAME"
 	exit 0
 fi
 
 # if we're in a tmux session, switch to the existing session
-tmux switch-client -t $SESSION_NAME
+tmux switch-client -t="$SESSION_NAME"
