@@ -1,4 +1,5 @@
-#/bin/bash
+#!/usr/bin/env bash
+
 languages=`echo "golang lua cpp c rust kotlin" | tr ' ' '\n'`
 
 selected=`printf "$languages\n" | fzf`
