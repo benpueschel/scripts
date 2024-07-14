@@ -3,17 +3,17 @@
 # This script creates a new tmux session with two windows:
 # 1. Your editor of choice (uses $EDITOR if set, otherwise defaults to vim)
 # 2. A shell prompt with git status
-# 
+#
 # If the session already exists, the script will attach to it.
-# If the script is run from within a tmux session, 
+# If the script is run from within a tmux session,
 # it will switch to the existing session.
 #
 # Usage: tmux-dev [target-directory] [session-name]
 #
 # If no arguments are provided, the script will use fzf to select a directory
-# and default to the directory name as the session name. 
-# If only one argument is provided, it will be used as the target directory and 
-# the session name will default to the directory name. 
+# and default to the directory name as the session name.
+# If only one argument is provided, it will be used as the target directory and
+# the session name will default to the directory name.
 # If two arguments are provided, the first will be used as the target directory
 # and the second as the session name.
 
@@ -60,9 +60,9 @@ fi
 
 SESSION_NAME=$2
 if [ -z $SESSION_NAME ]; then
-	SESSION_NAME=${TARGET##*/} 			# default to target directory name if 
+	SESSION_NAME=${TARGET##*/} 			# default to target directory name if
 										# no argument is present
-	SESSION_NAME=${SESSION_NAME:-/} 	# to correct for the case where 
+	SESSION_NAME=${SESSION_NAME:-/} 	# to correct for the case where
 										# TARGET=/
 fi
 
