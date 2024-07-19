@@ -29,3 +29,13 @@ Requires an arch-based system with `pacman` and `notify-send`.
 Notifies the user of available updates.
 `-h` shows the help message.
 `-s` syncs the pacman database before checking for updates (requires `sudo`).
+
+## loop
+```sh
+loop [-h] [-i] [-n] <command>
+```
+Runs a command every `interval` seconds.
+`-i <interval>` sets the interval in seconds to wait after each command (default is 0).
+`-n <times>` sets the number of times to run the command (default is infinite).
+`-h` shows the help message.
+

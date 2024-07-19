@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+# Get the name of the script, without the path
+NAME=$(basename $0)
+
+help() {
+	echo "Repeat a command at regular intervals"
+	echo ""
+	echo "Usage: $NAME [-h] [-t] <COMMAND>"
+	echo ""
+	echo "Options:"
+	echo "  -h  Show this help message and exit"
+	echo "  -i  Interval in seconds to wait after each command"
+	echo "  -n  Number of times to run the command (default is infinite)"
+	echo "  -c  Clear the screen before each command"
+	echo ""
+	echo "Example:"
+	echo "  $NAME -i 5 date  -  Print the date every 5 seconds"
+	echo "  $NAME -c -i 1 cat \"hello.txt\"  -  Clear the screen and print the contents of hello.txt every second"
+	exit 0
+}
+
+# If no arguments are passed, show help
+if [[ $# -eq 0 ]]; then
+	help
+fi
+
+# Parse the arguments
+while getopts :h:i:n:c flag; do
+	case "${flag}" in
+	# case h: print help
+		h) help;;
+		i) WAIT_TIME=${OPTARG};;
+		n) COUNT=${OPTARG};;
+		c) CLEAR=1;;
+		*) help;;
+	esac
+done
+
+# The command to run is the last argument, after the options.
+# OPTIND is the index of the next argument to be processed by getopts, but since
+# we've already processed all the options, it points to the next argument after
+# the options.
+COMMAND=${@:${OPTIND:-1}}
+
+run_command() {
+	# Clear the screen if the -c flag is set
+	if [[ $CLEAR ]]; then
+		clear
+	fi
+	# Execute the command
+	$COMMAND
+	# If a wait time is set, sleep for that duration
+	if [[ $WAIT_TIME ]]; then
+		sleep ${WAIT_TIME}
+	fi
+}
+
+if [[ $COUNT ]]; then
+	for ((i=0; i<$COUNT; i++)); do
+		run_command
+	done
+else
+	while true; do
+		run_command
+	done
+fi
