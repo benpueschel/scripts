@@ -20,3 +20,12 @@ cht.sh
 Requires [fzf](https://github.com/junegunn/fzf).
 Provides the user with a selection of languages to query [cht.sh](https://cht.sh).
 Asks for a query and launches a new tmux window that shows the cht.sh output.
+
+## pacman-notify
+```sh
+pacman-notify [-h] [-s]
+```
+Requires an arch-based system with `pacman` and `notify-send`.
+Notifies the user of available updates.
+`-h` shows the help message.
+`-s` syncs the pacman database before checking for updates (requires `sudo`).

@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+NAME=$(basename $0)
+help() {
+	echo "Notify about available updates"
+	echo ""
+	echo "Usage: $NAME [options]"
+	echo ""
+	echo "Options:"
+	echo "  -s	Sync database before checking for updates (requires sudo)"
+	echo "  -h	Show this help"
+}
+
+while getopts :sh opt; do
+   case $opt in
+	  s) SYNC=true;;
+	  h) help; exit 0;;
+	  *) help; exit 1;;
+   esac
+done
+
+if [[ $SYNC ]]; then
+   sudo pacman -Sy
+   # exit if sync failed
+   if [ $? -ne 0 ]; then exit 1; fi
+fi
+PACKAGES=$(pacman -Qu)
+
+if [ "$PACKAGES" == "" ]; then
+   exit 0
+else
+   notify-send -i ~/.local/scripts/arch.svg -u low -a pacman "New packages" "${PACKAGES:=none}"
+fi
+
+
