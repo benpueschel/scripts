@@ -25,7 +25,7 @@ Asks for a query and launches a new tmux window that shows the cht.sh output.
 ```sh
 pacman-notify [-h] [-s]
 ```
-Requires an arch-based system with `pacman` and `notify-send`.
+Requires an arch-based system with `pacman` and [notify-send](https://wiki.archlinux.org/title/Desktop_notifications).
 Notifies the user of available updates.
 `-h` shows the help message.
 `-s` syncs the pacman database before checking for updates (requires `sudo`).
