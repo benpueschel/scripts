@@ -48,8 +48,8 @@ function make_session {
 TARGET=$1
 if [ -z $TARGET ]; then
 	# use fzf to select a directory if no argument is present
-	folders="~/projects"
-	TARGET=$(find ~/ ~/projects -mindepth 1 -maxdepth 1 -type d | fzf)
+	folders="~/ ~/projects ~/vaults"
+	TARGET=$(find ~/ ~/projects ~/vaults -mindepth 1 -maxdepth 1 -type d | fzf)
 else
 	TARGET=$(realpath $TARGET)
 fi
