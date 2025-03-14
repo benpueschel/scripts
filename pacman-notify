@@ -7,29 +7,39 @@ help() {
 	echo "Usage: $NAME [options]"
 	echo ""
 	echo "Options:"
-	echo "  -s	Sync database before checking for updates (requires sudo)"
-	echo "  -h	Show this help"
+	echo "  -s            Sync database before checking for updates (requires sudo)"
+	echo "  -c <command>  Custom command to run, default is 'pacman -Qu'"
+	echo "  -h            Show this help"
 }
 
-while getopts :sh opt; do
-   case $opt in
-	  s) SYNC=true;;
-	  h) help; exit 0;;
-	  *) help; exit 1;;
-   esac
+COMMAND="pacman -Qu"
+
+while getopts :c:sh opt; do
+	case $opt in
+		s) SYNC=true;;
+		c) COMMAND=${OPTARG};;
+		h) help; exit 0;;
+		*) help; exit 1;;
+	esac
 done
 
 if [[ $SYNC ]]; then
-   sudo pacman -Sy
-   # exit if sync failed
-   if [ $? -ne 0 ]; then exit 1; fi
+	sudo pacman -Sy
+	# exit if sync failed
+	if [ $? -ne 0 ]; then exit 1; fi
 fi
-PACKAGES=$(pacman -Qu)
+PACKAGES=$($COMMAND)
+
+if [[ $YAY ]]; then
+	if [[ -n $PACKAGES ]]; then
+		PACKAGES+="\n"
+	fi
+fi
 
 if [ "$PACKAGES" == "" ]; then
-   exit 0
+	exit 0
 else
-   notify-send -i ~/.local/scripts/arch.svg -u low -a pacman "New packages" "${PACKAGES:=none}"
+	notify-send -i ~/.local/scripts/arch.svg -u low -a pacman "New packages" "$PACKAGES"
 fi
 
 
